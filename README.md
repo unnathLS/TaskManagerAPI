@@ -137,21 +137,21 @@ Ou pela IDE, rodando a classe TaskManagerApiApplication.
 OBS: Ajuste essa seção conforme o que você já implementou.
 
 ## Autenticação
-- POST /api/auth/register – cadastro de usuário
-- POST /api/auth/login     – login do usuário
+- `POST /api/auth/register – cadastro de usuário`
+- `POST /api/auth/login     – login do usuário`
 ## Tarefas (protegidos por autenticação)
-- GET    /api/tasks         – lista tarefas do usuário logado
-- GET    /api/tasks/{id}    – busca tarefa por ID
-- POST   /api/tasks         – cria nova tarefa
-- PUT    /api/tasks/{id}    – atualiza tarefa
-- DELETE /api/tasks/{id}    – exclui tarefa
+- `GET    /api/tasks         – lista tarefas do usuário logado`
+- `GET    /api/tasks/{id}    – busca tarefa por ID`
+- `POST   /api/tasks         – cria nova tarefa`
+- `PUT    /api/tasks/{id}    – atualiza tarefa`
+- `DELETE /api/tasks/{id}    – exclui tarefa`
 
 ---
 ## ✅ Status do Projeto
 Este projeto está em desenvolvimento com foco em aprendizado, então algumas partes podem estar:
 
 - Em fase de teste
-- udando de implementação (ex: de usuário em memória → banco de dados)
+- Mudando de implementação (ex: de usuário em memória → banco de dados)
 - Simples de propósito, para facilitar o entendimento
 ---
 # 📚 O que estou aprendendo com esse projeto
@@ -172,7 +172,10 @@ Este projeto está em desenvolvimento com foco em aprendizado, então algumas pa
 - Documentar toda a API com Swagger/OpenAPI
 - Adicionar testes unitários e de integração (JUnit + Mockito)
 - Dockerizar a aplicação (Dockerfile + docker-compose)
-
+---
 # 🧑‍💻 Contribuição
 Este é um projeto de estudo pessoal, mas sugestões e feedbacks são super bem-vindos!
 Sinta-se à vontade para abrir uma issue ou mandar ideias de melhoria.
+---
+# 📄 Licença
+Este projeto é de uso livre para fins de estudo.
