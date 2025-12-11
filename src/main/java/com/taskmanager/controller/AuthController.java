@@ -66,9 +66,9 @@ public class AuthController {
 
         // Como UserDetails.getUsername() agora retorna o email, podemos usá-lo diretamente.
         // Para pegar o username original, precisaríamos de um cast ou um método customizado.
-        com.taskmanager.model.User user = userService.findByUsername(userDetails.getUsername());
+        com.taskmanager.model.User user = userService.findByEmail(userDetails.getUsername());
 
-        JwtResponse response = new JwtResponse(jwt, user.getUsername(), userDetails.getUsername(), roles);
+        JwtResponse response = new JwtResponse(jwt, user.getUsername(), user.getEmail(), roles);
 
         return ResponseEntity.ok(response);
     }

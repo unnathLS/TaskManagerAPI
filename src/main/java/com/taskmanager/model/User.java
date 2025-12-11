@@ -54,6 +54,12 @@ public class User implements UserDetails {
                 .collect(Collectors.toSet());
     }
 
+    // Faz o Spring Security usar o email como "username" para autenticação
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
     // Métodos obrigatórios do UserDetails
     @Override
     public boolean isAccountNonExpired() {
