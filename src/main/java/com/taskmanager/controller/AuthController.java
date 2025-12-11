@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +22,9 @@ import com.taskmanager.util.JwtUtil;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -34,9 +37,6 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Autowired
     private UserService userService;
@@ -55,26 +55,26 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
+        // O principal agora é o nosso objeto User que implementa UserDetails
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
-        String jwt = jwtUtil.generateToken(userDetails);
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .get()
-                .getAuthority()
-                .replace("ROLE_", "");
+        String jwt = jwtUtil.generateToken(userDetails); // O subject do token será o email
 
-        JwtResponse response = new JwtResponse(jwt, userDetails.getUsername(), request.email(), role);
+        // Como UserDetails.getUsername() agora retorna o email, podemos usá-lo diretamente.
+        // Para pegar o username original, precisaríamos de um cast ou um método customizado.
+        com.taskmanager.model.User user = userService.findByUsername(userDetails.getUsername());
+
+        JwtResponse response = new JwtResponse(jwt, user.getUsername(), userDetails.getUsername(), roles);
 
         return ResponseEntity.ok(response);
-
     }
 
-    @GetMapping("/api/auth/teste-logado")
+    @GetMapping("/teste-logado")
     public String testeLogado() {
-        return "DEU CERTO PORRA! Você está autenticado como: " +
-                SecurityContextHolder.getContext().getAuthentication().getName();
+        return "Você está autenticado como: " + SecurityContextHolder.getContext().getAuthentication().getName();
     }
-
 }
