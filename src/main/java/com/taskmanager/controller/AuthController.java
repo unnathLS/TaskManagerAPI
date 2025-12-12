@@ -51,7 +51,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest request) {
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+                new UsernamePasswordAuthenticationToken(request.identifier(), request.password()));
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -64,11 +64,17 @@ public class AuthController {
 
         String jwt = jwtUtil.generateToken(userDetails); // O subject do token será o email
 
-        // Como UserDetails.getUsername() agora retorna o email, podemos usá-lo diretamente.
-        // Para pegar o username original, precisaríamos de um cast ou um método customizado.
-        com.taskmanager.model.User user = userService.findByEmail(userDetails.getUsername());
+        // Como UserDetails.getUsername() agora retorna o email, podemos usá-lo
+        // diretamente.
+        // Para pegar o username original, precisaríamos de um cast ou um método
+        // customizado.
+        User user = userService.findByEmailOrUsername(userDetails.getUsername());
 
-        JwtResponse response = new JwtResponse(jwt, user.getUsername(), user.getEmail(), roles);
+        JwtResponse response = new JwtResponse(
+                jwt,
+                user.getUsername(),
+                user.getEmail(),
+                roles);
 
         return ResponseEntity.ok(response);
     }

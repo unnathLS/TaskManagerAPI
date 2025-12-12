@@ -30,6 +30,11 @@ public class UserService {
 
     }
 
+    public User findByEmailOrUsername(String indentifier){
+        return userRepository.findByEmailOrUsername(indentifier, indentifier)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado (email/username): " + indentifier));
+    }
+
     public User findByUsername(String username){
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

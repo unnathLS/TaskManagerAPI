@@ -57,7 +57,7 @@ public class User implements UserDetails {
     // Faz o Spring Security usar o email como "username" para autenticação
     @Override
     public String getUsername() {
-        return this.email;
+        return this.username;
     }
 
     // Métodos obrigatórios do UserDetails

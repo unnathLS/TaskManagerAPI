@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-// SEM @Component !!!
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -29,24 +28,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // ... seu código igualzinho
+
         String header = request.getHeader("Authorization");
+
+        // Se não tem header ou não começa com "Bearer ", ignora e segue
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = header.substring(7);
-        String username = jwtUtil.extractUsername(token);
+        String username = null;
 
+        // IMPORTANTE: trata exceções ao extrair o username
+        try {
+            username = jwtUtil.extractUsername(token);
+        } catch (Exception e) {
+            // Token inválido/expirado/malformado: apenas loga e ignora
+            System.out.println("Erro ao extrair username do token: " + e.getMessage());
+            // NÃO lança exceção, apenas deixa username = null
+        }
+
+        // Se conseguiu extrair o username e não há autenticação no contexto
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(token, userDetails)) {
-                var auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                // Valida o token
+                if (jwtUtil.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken auth = 
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } catch (Exception e) {
+                // Usuário não encontrado ou erro na validação: apenas loga e ignora
+                System.out.println("Erro ao autenticar usuário: " + e.getMessage());
             }
         }
+
+        // SEMPRE chama o próximo filtro
         filterChain.doFilter(request, response);
     }
 }
